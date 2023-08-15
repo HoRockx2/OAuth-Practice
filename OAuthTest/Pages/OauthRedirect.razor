@@ -1,0 +1,56 @@
+﻿@page "/oauth/redirect"
+@using System.Web
+@inject NavigationManager Nav
+@inject HttpClient Http
+
+<h3>Component1</h3>
+
+@if(!ready)
+{
+        <p><em>Loading...</em></p>
+}
+else
+{
+        <div>
+            <p>Response</p>
+            <p>@_rsp</p>
+            <p>@_code</p>
+        </div>
+}
+
+
+@code {
+    private string _code = "";
+    private bool ready = false;
+    private string _rsp;
+
+    private string ClientID = "877162216664-m74iu54687qed214ltfcion174rhsdpm.apps.googleusercontent.com";
+    private string SecretKey = "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";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var queryString = HttpUtility.ParseQueryString(new Uri(Nav.Uri).Query);
+
+        _code = queryString["code"];
+
+        var apiEndPoint = "https://oauth2.googleapis.com/token";
+        var param = new Dictionary<string, string>()
+        {
+            {"code", _code},
+            {"redirect_uri", "http://localhost:5041/oauth/redirect" },
+            {"client_id", ClientID },
+            {"client_secret", SecretKey },
+            {"grant_type", "authorization_code" }
+        };
+
+        var content = new FormUrlEncodedContent(param);
+
+        var rsp = await Http.PostAsync(apiEndPoint, content);
+        var rspstring = await rsp.Content.ReadAsStringAsync();
+
+        _rsp = rspstring;
+        ready = true;
+    }
+}
+

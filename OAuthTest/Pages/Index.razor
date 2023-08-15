@@ -1,0 +1,37 @@
+﻿@page "/"
+@inject NavigationManager Nav
+@using Microsoft.AspNetCore.WebUtilities
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<div>
+    <button class="btn btn-primary" onclick="@OnClickGoToOAuth">Go To OAuth2</button>
+</div>
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code
+{
+    private string ClientID = "877162216664-m74iu54687qed214ltfcion174rhsdpm.apps.googleusercontent.com";
+    private string SecretKey = "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";
+
+    private void OnClickGoToOAuth()
+    {
+        var OauthUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+        var param = new Dictionary<string, string>()
+        {
+            {"response_type", "code" },
+            {"scope", "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar" },
+            {"redirect_uri", "http://localhost:5041/oauth/redirect" },
+            {"client_id", ClientID }
+        };
+
+        var final = new Uri(QueryHelpers.AddQueryString(OauthUrl, param));
+
+        Nav.NavigateTo(final.ToString());
+    }
+}
